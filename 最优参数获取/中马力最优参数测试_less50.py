@@ -201,13 +201,7 @@ def plot_acc(df):
     o_abs = []
     o = []
 
-#     for i in range(7):
-#         if i <1 :
-#             t.append(df[(df['马力'] >=25+10*i) & (df['马力'] <40)])
-#         else:
-#             t.append(df[(df['马力'] >=30+10*i) & (df['马力'] <(i+1)*10+30)])
-#         o1 = t[i]['实际值'].sum()
-#         o2 = t[i]['pre'].sum()
+
     o1 = df['实际值']
     o2 = df['pre']
     o_abs.append(abs(o1-o2)/o1)

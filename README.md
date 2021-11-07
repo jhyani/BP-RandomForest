@@ -1,7 +1,7 @@
 #BP_script
 - 大马力和中马力分别基于学习率与训练次数循环125次，找到平均误差最小的那一组参数
 #script:
-def main1():
+"""def main1():
     lr = [0.005,0.01,0.015,0.02,0.025]
     echo = [400,700,1000,1300,1600]
     all = [data1_1,data1_2]
@@ -23,4 +23,4 @@ def main1():
                 x_data, y_data, mean_y, std_y = normal(data)
                 loss_function, optimizer, pred, x, y, b, w = model(learning_rate)
                 run_model(loss_function, optimizer, pred, x_data, y_data, x, y, b, w,train_epochs)
-                true,pre,error, error_abs = prediction(pred,x,1,data_test[1])
+                true,pre,error, error_abs = prediction(pred,x,1,data_test[1])"""

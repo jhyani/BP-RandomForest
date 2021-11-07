@@ -1,10 +1,16 @@
-import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd  # 能快速读取常规大小的文件。Pandas能提供高性能、易用的数据结构和数据分析工具
+from sklearn.utils import shuffle  # 随机打乱工具，将原有序列打乱，返回一个全新的顺序错乱的值
+from collections import OrderedDict
+import xlwt
+
 data1 = pd.read_excel('大中马力误差记录/大马力.xls',sheet_name = 'sheet1', usecols=[1,2,8,25,26],header = 0, encoding='utf-8')
 
 data2 = pd.read_excel('大中马力误差记录/中马力.xls',sheet_name = 'sheet1', usecols=[1,2,8,20,21],header = 0, encoding='utf-8')
 
 df = pd.concat([data1, data2], axis = 0)
-print(df)
+
 
 def split_range(df):
     t1 = []
@@ -29,7 +35,7 @@ def split_range(df):
         
         o1 = t1[i]['实际值'].sum()
         o2 = t1[i]['pre'].sum()
-        o_abs1.append((o2-o1)/o1)
+        o_abs1.append(abs(o2-o1)/o1)
         tr_sum1.append(o1)
         pre_sum1.append(o2)
     
@@ -50,7 +56,7 @@ def split_range(df):
 
         o1 = t2[i]['实际值'].sum()
         o2 = t2[i]['pre'].sum()
-        o_abs2.append((o2-o1)/o1)
+        o_abs2.append(abs(o2-o1)/o1)
         tr_sum2.append(o1)
         pre_sum2.append(o2)
     tr_sum = tr_sum1 + tr_sum2
@@ -62,12 +68,9 @@ def split_range(df):
     return tr_sum,pre_sum,o_abs,engin
 
 
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd  # 能快速读取常规大小的文件。Pandas能提供高性能、易用的数据结构和数据分析工具
-from sklearn.utils import shuffle  # 随机打乱工具，将原有序列打乱，返回一个全新的顺序错乱的值
-from collections import OrderedDict
-import xlwt
+
+
+
 def plot_acc(df):
 
     ##数据分为西安和山东两组，分别输出世纪指与预测值的曲线对比图
@@ -86,7 +89,7 @@ def plot_acc(df):
     plt.rcParams['font.sans-serif']=['SimHei']  # 用来正常显示中文标签
     plt.rcParams['axes.unicode_minus']=False  # 用来正常显示负号
     fig1 = plt.figure()
-    plt.title('各个马力区间绝误差率',fontsize=14)  # 标题，字号设置
+    plt.title('各马力区间误差率',fontsize=14)  # 标题，字号设置
     plt.plot(engin1,o_abs1,color='r', label= '陕西省: average=%s'%(sum(o_abs1)/len(o_abs1)))
     plt.plot(engin2,o_abs2,color='b', label= '山东省: average=%s'%(sum(o_abs2)/len(o_abs2)))
     plt.scatter(engin1,o_abs1, s=area, c='r', alpha=0.4, label='陕西省')
@@ -97,7 +100,7 @@ def plot_acc(df):
         
         
 
-    plt.ylim([-5, 5])
+    plt.ylim([-2, 2])
     plt.xlabel('马力区间')  # 位置设置
     plt.ylabel('误差率')  # 方向，位置设置
     plt.legend()
@@ -119,7 +122,7 @@ def plot_acc(df):
 
     
     fig5 = plt.figure()
-    plt.title('山东各个马力区间绝实际值vs预测值',fontsize=14)  # 标题，字号设置
+    plt.title('山东各马力区间实际值vs预测值',fontsize=14)  # 标题，字号设置
     plt.plot(engin2,tr_sum2,color='r', label= '实际值')
     plt.plot(engin2,pre_sum2,color='b', label= '预测值')
     plt.scatter(engin2,tr_sum2, s=area, c='r', alpha=0.4, label='实际值')
@@ -130,15 +133,18 @@ def plot_acc(df):
     plt.legend()
     plt.xticks(rotation=45)
     plt.show()
-
-    fig1.savefig('大马力误差率.png')
-    fig4.savefig('大马力陕西预测.png')
-    fig5.savefig('大马力山东预测.png')
-    writer = pd.ExcelWriter('大马力最优解结算结果-1106.xls',engine='xlsxwriter')
+    
+    fig1.tight_layout()
+    fig1.savefig('误差率.png')
+    fig4.tight_layout()
+    fig4.savefig('陕西预测.png')
+    fig5.tight_layout()
+    fig5.savefig('山东预测.png')
+    writer = pd.ExcelWriter('最优解计算结果_1107_v3.xls',engine='xlsxwriter')
     sheet = writer.book.add_worksheet('sheet1f')
-    sheet.insert_image(0,0,'大马力误差率.png')
-    sheet.insert_image(0,10,'大马力陕西预测.png')
-    sheet.insert_image(0,20,'大马力山东预测.png')
+    sheet.insert_image(0,0,'误差率.png')
+    sheet.insert_image(0,10,'陕西预测.png')
+    sheet.insert_image(0,20,'山东预测.png')
     df.to_excel(writer, sheet_name='sheet1', startrow = 0 )
     writer.save()
 

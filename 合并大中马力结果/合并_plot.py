@@ -15,6 +15,9 @@ df = pd.concat([data1, data2], axis = 0)
 def split_range(df):
     t1 = []
     t2 = []
+    o_nabs1 = []
+    o_nabs2 = []
+    o2 = []
     o_abs1 = []
     tr_sum1 = []
     pre_sum1 = []
@@ -36,6 +39,7 @@ def split_range(df):
         o1 = t1[i]['实际值'].sum()
         o2 = t1[i]['pre'].sum()
         o_abs1.append(abs(o2-o1)/o1)
+        o_nabs1.append((o2-o1)/o1)
         tr_sum1.append(o1)
         pre_sum1.append(o2)
     
@@ -57,15 +61,17 @@ def split_range(df):
         o1 = t2[i]['实际值'].sum()
         o2 = t2[i]['pre'].sum()
         o_abs2.append(abs(o2-o1)/o1)
+        o_nabs2.append((o2-o1)/o1)
         tr_sum2.append(o1)
         pre_sum2.append(o2)
     tr_sum = tr_sum1 + tr_sum2
     pre_sum = pre_sum1 + pre_sum2
     o_abs = o_abs1 + o_abs2
     engin = engin1 + engin2
+    o_nabs = o_nabs1 + o_nabs2
     
 
-    return tr_sum,pre_sum,o_abs,engin
+    return tr_sum,pre_sum,o_abs,o_nabs, engin
 
 
 
@@ -76,8 +82,8 @@ def plot_acc(df):
     ##数据分为西安和山东两组，分别输出世纪指与预测值的曲线对比图
     df1 = df[df['省份'] == '陕西']
     df2 = df[df['省份'] == '山东']
-    tr_sum1, pre_sum1, o_abs1,engin1 = split_range(df1)
-    tr_sum2, pre_sum2, o_abs2, engin2 = split_range(df2)
+    tr_sum1, pre_sum1, o_abs1,o_nabs1,engin1 = split_range(df1)
+    tr_sum2, pre_sum2, o_abs2,o_nabs2, engin2 = split_range(df2)
     engin = [engin1,engin2]
 #     print("hahahah", o_abs1)
         
@@ -90,12 +96,12 @@ def plot_acc(df):
     plt.rcParams['axes.unicode_minus']=False  # 用来正常显示负号
     fig1 = plt.figure()
     plt.title('各马力区间误差率',fontsize=14)  # 标题，字号设置
-    plt.plot(engin1,o_abs1,color='r', label= '陕西省: average=%s'%(sum(o_abs1)/len(o_abs1)))
-    plt.plot(engin2,o_abs2,color='b', label= '山东省: average=%s'%(sum(o_abs2)/len(o_abs2)))
-    plt.scatter(engin1,o_abs1, s=area, c='r', alpha=0.4, label='陕西省')
-    plt.scatter(engin2,o_abs2, s=area, c='b', alpha=0.4, label='山东省')
+    plt.plot(engin1,o_nabs1,color='r', label= '陕西省: average=%s'%(sum(o_abs1)/len(o_abs1)))
+    plt.plot(engin2,o_nabs2,color='b', label= '山东省: average=%s'%(sum(o_abs2)/len(o_abs2)))
+    plt.scatter(engin1,o_nabs1, s=area, c='r', alpha=0.4, label='陕西省')
+    plt.scatter(engin2,o_nabs2, s=area, c='b', alpha=0.4, label='山东省')
     print("陕西省误差：")
-    for i,j in zip(engin1,o_abs1):
+    for i,j in zip(engin1,o_nabs1):
         print("%s: %s"%(i,j))
         
         
@@ -140,7 +146,7 @@ def plot_acc(df):
     fig4.savefig('陕西预测.png')
     fig5.tight_layout()
     fig5.savefig('山东预测.png')
-    writer = pd.ExcelWriter('最优解计算结果_1107_v3.xls',engine='xlsxwriter')
+    writer = pd.ExcelWriter('最优解计算结果_1107_v4.xls',engine='xlsxwriter')
     sheet = writer.book.add_worksheet('sheet1f')
     sheet.insert_image(0,0,'误差率.png')
     sheet.insert_image(0,10,'陕西预测.png')
